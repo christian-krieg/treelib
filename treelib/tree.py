@@ -145,7 +145,8 @@ class Tree(object):
 
     def __print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
                         key=None, reverse=False, line_type='ascii-ex',
-                        data_property=None, func=print):
+                        data_property=None, func=print,
+                        format_label=lambda x,y: y):
         """
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -189,7 +190,8 @@ class Tree(object):
         # iter with func
         for pre, node in self.__get(nid, level, filter, key, reverse,
                                     line_type):
-            label = get_label(node)
+            label = format_label(node, get_label(node))
+#            print(f"label: {label}")
             func('{0}{1}'.format(pre, label).encode('utf-8'))
 
     def __get(self, nid, level, filter_, key, reverse, line_type):
@@ -784,7 +786,8 @@ class Tree(object):
                              key, reverse, line_type, data_property, func=handler)
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
-             key=None, reverse=False, line_type='ascii-ex', data_property=None, stdout=True):
+             key=None, reverse=False, line_type='ascii-ex', data_property=None,
+             stdout=True, format_label = lambda x,y: y):
         """
         Print the tree structure in hierarchy style.
 
@@ -805,6 +808,9 @@ class Tree(object):
         :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
         :param line_type:
         :param data_property: the property on the node data object to be printed.
+        :param format_label: A function which takes `node` and `label` as
+            arguments, and returns a string being the formatted label. Default
+            is to return the label as-is
         :return: None
         """
         self._reader = ""
@@ -814,7 +820,8 @@ class Tree(object):
 
         try:
             self.__print_backend(nid, level, idhidden, filter,
-                                 key, reverse, line_type, data_property, func=write)
+                                 key, reverse, line_type, data_property,
+                                 func=write, format_label = format_label)
         except NodeIDAbsentError:
             print('Tree is empty')
 
